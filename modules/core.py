@@ -25,7 +25,10 @@ except ImportError:
 
 import modules.globals
 import modules.metadata
-import modules.ui as ui
+try:
+    import modules.ui as ui
+except ImportError:
+    ui = None
 from modules.processors.frame.core import get_frame_processors_modules, process_video_in_memory
 from modules.utilities import has_image_extension, is_image, is_video, detect_fps, create_video, extract_frames, get_temp_frame_paths, restore_audio, create_temp, move_temp, clean_temp, normalize_output_path
 
@@ -205,7 +208,7 @@ def pre_check() -> bool:
 
 def update_status(message: str, scope: str = 'DLC.CORE') -> None:
     print(f'[{scope}] {message}')
-    if not modules.globals.headless:
+    if not modules.globals.headless and ui:
         ui.update_status(message)
 
 def start() -> None:
@@ -221,7 +224,7 @@ def start() -> None:
     
     # process image to image
     if has_image_extension(modules.globals.target_path):
-        if modules.globals.nsfw_filter and ui.check_and_ignore_nsfw(modules.globals.target_path, destroy):
+        if modules.globals.nsfw_filter and ui and ui.check_and_ignore_nsfw(modules.globals.target_path, destroy):
             return
         try:
             shutil.copy2(modules.globals.target_path, modules.globals.output_path)
@@ -239,7 +242,7 @@ def start() -> None:
         return
     
     # process image to videos
-    if modules.globals.nsfw_filter and ui.check_and_ignore_nsfw(modules.globals.target_path, destroy):
+    if modules.globals.nsfw_filter and ui and ui.check_and_ignore_nsfw(modules.globals.target_path, destroy):
         return
 
     # Detect FPS early (needed by both pipelines)
@@ -347,6 +350,9 @@ def run() -> None:
     limit_resources()
     if modules.globals.headless:
         start()
-    else:
+    elif ui:
         window = ui.init(start, destroy, modules.globals.lang)
         window.mainloop()
+    else:
+        print('[DLC.CORE] UI unavailable (PySide6 not installed). Running in headless mode.')
+        start()
