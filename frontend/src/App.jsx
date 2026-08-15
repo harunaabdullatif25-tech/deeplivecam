@@ -6,7 +6,7 @@ import React, { useState, useRef } from "react";
  *              gives you after you deploy the backend.
  * ────────────────────────────────────────────────────────────
  */
-const API_BASE = "https://deep-live-cam-backend.onrender.com";
+const API_BASE = "https://deeplivecam.onrender.com";
 
 export default function App() {
   const [sourceFile, setSourceFile] = useState(null);
