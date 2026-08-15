@@ -81,6 +81,18 @@ def process():
     out_name = f"{job_id}_output.{out_ext}"
     out_path = os.path.join(RESULT_DIR, out_name)
 
+    # Read optional configuration options from form data
+    frame_processors = request.form.getlist("frame_processors")
+    if not frame_processors:
+        # Default frame processor
+        frame_processors = ["face_swapper"]
+
+    many_faces = request.form.get("many_faces", "false").lower() == "true"
+    mouth_mask = request.form.get("mouth_mask", "false").lower() == "true"
+    keep_audio = request.form.get("keep_audio", "true").lower() == "true"
+    keep_fps = request.form.get("keep_fps", "false").lower() == "true"
+    nsfw_filter = request.form.get("nsfw_filter", "false").lower() == "true"
+
     # Build the CLI command
     cmd = [
         sys.executable,         # python interpreter
@@ -89,9 +101,19 @@ def process():
         "-t", tgt_path,         # target image/video
         "-o", out_path,         # output
         "--execution-provider", "cpu",
-        "--keep-audio",
-        "--many-faces",
+        "--frame-processor", *frame_processors,
     ]
+
+    if many_faces:
+        cmd.append("--many-faces")
+    if mouth_mask:
+        cmd.append("--mouth-mask")
+    if keep_audio:
+        cmd.append("--keep-audio")
+    if keep_fps:
+        cmd.append("--keep-fps")
+    if nsfw_filter:
+        cmd.append("--nsfw-filter")
 
     app.logger.info("Running: %s", " ".join(cmd))
 
