@@ -1,0 +1,18 @@
+# ── Backend API dependencies ──────────────────────
+flask>=3.0
+gunicorn>=22.0
+flask-cors>=4.0
+
+# ── Deep Live Cam core dependencies ──────────────
+numpy>=2.0,<3
+opencv-python-headless==4.14.0.94
+onnx==1.22.0
+insightface>=0.7.3
+psutil==7.2.2
+pillow==12.3.0
+tqdm>=4.66.3
+onnxruntime>=1.15.0
+opennsfw2==0.18.0
+keras>=3.0.0
+protobuf>=6.33.5,<8
+scikit-learn
